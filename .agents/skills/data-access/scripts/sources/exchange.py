@@ -62,6 +62,60 @@ def dragon_tiger_backup(trade_date: Optional[str] = None) -> dict:
     return out
 
 
+SSE_OVERVIEW_SQL = "COMMON_SSE_SJ_GPSJ_CJGK_MRGK_C"
+# 上交所每日概况的产品行:01 主板 A 股、02 B 股、03 科创板、17 沪市合计
+SSE_OVERVIEW_PRODUCTS = {"01": "主板A股", "02": "B股", "03": "科创板", "17": "沪市合计"}
+
+
+def _f(v) -> Optional[float]:
+    try:
+        return float(str(v).replace(",", ""))
+    except (TypeError, ValueError):
+        return None
+
+
+def sse_market_overview(date: Optional[str] = None, lookback: int = 10) -> dict:
+    """上交所「每日概况」:按产品给市价总值 / 流通市值 / 成交金额 / 换手率(亿元、%,交易所原值不换算)。
+    date 缺省 = 北京时间今天;当天没有数据(非交易日 / 还没发布)就往前找最近一个有数据的交易日,最多 lookback 个自然日。
+    返回 {date(数据所属日), products:[{code,name,date,market_value,float_value,amount,list_num,turnover_pct,float_turnover_pct}], _raw};
+    换手率是交易所按「成交金额 ÷ 对应市值」算的,两个口径都给:turnover_pct 用市价总值,float_turnover_pct 用流通市值。
+    """
+    from datetime import datetime, timedelta
+    from common import TZ_SH
+
+    if date:
+        start = datetime.strptime(date, "%Y-%m-%d").date()
+        lookback = 1  # 指定了日期就只认这一天:找不到就报错,不偷偷换成别的日子
+    else:
+        start = datetime.now(TZ_SH).date()
+    rows, used = [], None
+    for back in range(max(1, lookback)):
+        day = (start - timedelta(days=back)).strftime("%Y-%m-%d")
+        d = http_json(f"https://query.sse.com.cn/commonQuery.do?sqlId={SSE_OVERVIEW_SQL}"
+                      f"&PRODUCT_CODE=01,02,03,17&type=inParams&SEARCH_DATE={day}",
+                      headers={"User-Agent": UA, "Referer": "https://www.sse.com.cn/market/stockdata/overview/day/"}, timeout=15)
+        rows = (d or {}).get("result") or []
+        if rows:
+            used = day
+            break
+    if not rows:
+        raise RuntimeError(f"上交所每日概况 {start} 往前 {lookback} 天都没有数据(非交易日或还没发布)")
+    ref = last_raw_ref()
+    products = []
+    for r in rows:
+        code = str(r.get("PRODUCT_CODE") or "").strip()
+        td = str(r.get("TRADE_DATE") or "").strip()
+        products.append({
+            "code": code, "name": SSE_OVERVIEW_PRODUCTS.get(code, code),
+            "date": f"{td[:4]}-{td[4:6]}-{td[6:]}" if len(td) == 8 else used,
+            "market_value": _f(r.get("TOTAL_VALUE")), "float_value": _f(r.get("NEGO_VALUE")),
+            "amount": _f(r.get("TRADE_AMT")), "list_num": _f(r.get("LIST_NUM")),
+            "turnover_pct": _f(r.get("TOTAL_TO_RATE")), "float_turnover_pct": _f(r.get("NEGO_TO_RATE")),
+            "_raw": ref,
+        })
+    return {"date": used, "products": products, "_raw": ref}
+
+
 def announcements_backup(code: str, page_size: int = 20) -> list[dict]:
     """公告备源:[{title, time, pdf}];深市 → szse annList,沪市 / 北交所 → 东财 np-anotice"""
     digits, market = norm_ticker(code, stock_only=True)

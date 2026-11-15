@@ -1,5 +1,6 @@
 # 用户私有层:配置 / 运行产物 / 知识层私有档案,永不入库
 .local/
+.workbuddy/
 
 # Python
 .venv/

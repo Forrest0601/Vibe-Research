@@ -1120,6 +1120,98 @@
       "stages": {},
       "enabled": true,
       "mapper_module": "mappers_cn",
+      "id": "pboc_social_financing_stock",
+      "title": "人民银行社会融资规模存量与同比(月度)",
+      "layer": "11 宏观",
+      "source": "pbc.gov.cn",
+      "module": "macro",
+      "function": "pboc_social_financing_stock",
+      "mapper": "pboc_social_financing_stock_map",
+      "endpoint_label": "pbc.gov.cn 社融存量统计表 xls",
+      "libs": [
+        "pandas"
+      ],
+      "args": {
+        "year": null
+      },
+      "notes": "--args {\"year\":2026};存量(万亿元)+ 官方同比增速(%);仅支持 2021 年起版式;月份按列位置对齐 1..12 月"
+    },
+    {
+      "market": [
+        "CN"
+      ],
+      "compliance": "cn-public",
+      "symbol_kind": "none",
+      "symbol_param": "code",
+      "stages": {},
+      "enabled": true,
+      "mapper_module": "mappers_cn",
+      "id": "pboc_money_supply",
+      "title": "人民银行货币供应量 M0/M1/M2(月末余额)",
+      "layer": "11 宏观",
+      "source": "pbc.gov.cn",
+      "module": "macro",
+      "function": "pboc_money_supply",
+      "mapper": "pboc_money_supply_map",
+      "endpoint_label": "pbc.gov.cn 货币统计概览 · 货币供应量 xls",
+      "libs": [
+        "pandas"
+      ],
+      "args": {
+        "year": null
+      },
+      "notes": "--args {\"year\":2026};亿元;表内无同比列,同比由调用方用上一年同月自算"
+    },
+    {
+      "market": [
+        "CN"
+      ],
+      "compliance": "cn-public",
+      "symbol_kind": "none",
+      "symbol_param": "code",
+      "stages": {},
+      "enabled": true,
+      "mapper_module": "mappers_cn",
+      "id": "em_macro_rrr",
+      "title": "存款准备金率历次调整(大型 / 中小型)",
+      "layer": "11 宏观",
+      "source": "eastmoney",
+      "module": "macro",
+      "function": "em_macro_rrr",
+      "mapper": "em_macro_rrr_map",
+      "endpoint_label": "东财 datacenter RPT_ECONOMY_DEPOSIT_RESERVE",
+      "notes": "--args {\"limit\":100};rate_big = 大型存款类调整后(%),change_* 为百分点;事件序列,非逐日"
+    },
+    {
+      "market": [
+        "CN"
+      ],
+      "compliance": "cn-public",
+      "symbol_kind": "none",
+      "symbol_param": "code",
+      "stages": {},
+      "enabled": true,
+      "mapper_module": "mappers_cn",
+      "id": "em_macro_gdp",
+      "title": "GDP 季度累计与累计同比",
+      "layer": "11 宏观",
+      "source": "eastmoney",
+      "module": "macro",
+      "function": "em_macro_gdp",
+      "mapper": "em_macro_gdp_map",
+      "endpoint_label": "东财 datacenter RPT_ECONOMY_GDP",
+      "notes": "--args {\"limit\":40};gdp_cum 亿元(现价累计),gdp_cum_yoy 为累计同比(%)"
+    },
+    {
+      "market": [
+        "CN"
+      ],
+      "compliance": "cn-public",
+      "symbol_kind": "none",
+      "symbol_param": "code",
+      "stages": {},
+      "enabled": true,
+      "mapper_module": "mappers_cn",
       "id": "nbs_pmi",
       "title": "国家统计局 PMI(制造业 / 非制造业 / 综合 + 大中小型)",
       "layer": "11 宏观",
@@ -1231,6 +1323,30 @@
         "trade_date": null
       },
       "notes": "--args {\"trade_date\":\"YYYY-MM-DD\"},默认北京时间当天"
+    },
+    {
+      "market": [
+        "CN"
+      ],
+      "compliance": "cn-public",
+      "symbol_kind": "none",
+      "symbol_param": "code",
+      "stages": {},
+      "enabled": true,
+      "mapper_module": "mappers_cn",
+      "id": "sse_market_overview",
+      "title": "上交所每日概况(沪市市价总值 / 流通市值 / 成交金额 / 换手率,按板块与合计)",
+      "layer": "19 指数",
+      "source": "sse",
+      "module": "exchange",
+      "function": "sse_market_overview",
+      "mapper": "sse_market_overview_map",
+      "endpoint_label": "query.sse.com.cn COMMON_SSE_SJ_GPSJ_CJGK_MRGK_C",
+      "args": {
+        "date": null
+      },
+      "cache_max_age_sec": 3600,
+      "notes": "--args {\"date\":\"YYYY-MM-DD\"};默认最近一个有数据的交易日(非交易日自动往前找,指定日期找不到就报错不冒充)。金额亿元、换手率 %(交易所原值);产品行 01 主板A股 / 02 B股 / 03 科创板 / 17 沪市合计"
     },
     {
       "market": [
@@ -1494,7 +1610,8 @@
         "adjust": null,
         "start": null,
         "end": null,
-        "count": 320
+        "count": 320,
+        "detail": false
       },
       "sample": "sz300308",
       "notes": "代码原样传:个股 600519,指数带前缀 sh000001(不带前缀的 000001 是平安银行);period=day/week/month/m1/m5/m15/m30/m60;日周月默认前复权、分钟只有不复权;科创板成交量是股、其余是手;没有成交额(要成交额用 tdx_daily_package);不支持北交所。替代 2026-09 起失效的通达信 K 线。上游 a-stock-data §1.2"
@@ -4124,10 +4241,11 @@
       "endpoint_label": "fred.stlouisfed.org/graph/fredgraph.csv",
       "args": {
         "series": "CPIAUCSL,CPILFESL,PCEPILFE,UNRATE,PAYEMS,FEDFUNDS,GDPC1",
-        "start": null
+        "start": null,
+        "detail": false
       },
       "cache_max_age_sec": 21600,
-      "notes": "免 key 的 CSV 下载(不用要 key 的 API);只收单位核对过的 12 个系列(另有 GDP / M2SL / INDPRO / ICSA / T10Y2Y),版权受限的系列不收;默认取近 10 年;全序列存为提取 CSV,环比同比交给 calc"
+      "notes": "免 key 的 CSV 下载(不用要 key 的 API);只收单位核对过的 13 个系列(另有 GDP / M2SL / INDPRO / ICSA / T10Y2Y / VIXCLS),版权受限的系列不收;默认取近 10 年;全序列存为提取 CSV,环比同比交给 calc;args.detail=true 时按观测点逐行出证据(配合 start 收窄)"
     }
   ]
 }

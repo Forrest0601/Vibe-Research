@@ -694,6 +694,11 @@ def em_market_trend_map(result: dict, ctx: dict) -> dict:
     for r in amounts[-60:]:
         evs.append(ev(ctx, "market_amount_total", r["total"], "元", r["date"], as_of=r["date"], record_key=f"amount|{r['date']}",
                       note=f"沪深两市成交额=上证指数成交额 {r['sh']:.0f} + 深证综指成交额 {r['sz']:.0f}(元)", raw_ref=r.get("_raw"), source=r.get("source") or "eastmoney"))
+        # 单市场成交额另出两行:换手率这类「单市场口径」指标要用上证自己的成交额,不能拿两市合计去除
+        evs.append(ev(ctx, "market_amount_sh", r["sh"], "元", r["date"], as_of=r["date"], record_key=f"amount_sh|{r['date']}",
+                      note="上证指数成交额(沪市全部股票,B 股含在内;元)", raw_ref=r.get("_raw"), source=r.get("source") or "eastmoney"))
+        evs.append(ev(ctx, "market_amount_sz", r["sz"], "元", r["date"], as_of=r["date"], record_key=f"amount_sz|{r['date']}",
+                      note="深证综指成交额(深市全部股票;元)", raw_ref=r.get("_raw"), source=r.get("source") or "eastmoney"))
     if amounts:
         tot = [r["total"] for r in amounts]
         day = amounts[-1]["date"]

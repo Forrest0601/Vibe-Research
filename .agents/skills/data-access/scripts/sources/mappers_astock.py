@@ -161,6 +161,12 @@ def tencent_kline_map(result, ctx: dict) -> dict:
                             ("low", f"kline_low_{adj}", unit), ("volume", "kline_volume", vunit)],
                   stamp if minute else _d(stamp), record_key=f"{code}:{period}:{stamp}", note=note, as_of=_d(stamp), adjustment=adj)
     evs.append(_count(c, "kline_points", len(rows), "根", _span(rows, dk), note=f"{code} {period}"))
+    # args.detail=true 时逐根出收盘证据(点多的请求请配合收窄 count;全序列仍以 raw 为准)
+    if (ctx.get("args") or {}).get("detail"):
+        for r in rows:
+            dv, cv = _d(str(r.get(dk))), to_float(r.get("close"))
+            if dv and cv is not None:
+                evs.append(_fields(c, r, [("close", "kline_close", unit)], dv, as_of=dv, adjustment=adj)[0])
     cols = {"date": dk, "open": "open", "high": "high", "low": "low", "close": "close", "volume": "volume"}
     return out(evs, extra={"code": code, "period": period, "adjust": adj, "rows": len(rows), "last3": rows[-3:], "calc_hint": _hint(cols)})
 

@@ -51,13 +51,15 @@ FRED_SERIES = {
     "INDPRO": ("us_industrial_production", "工业生产指数(季调)", "指数(2017=100)", "月"),
     "ICSA": ("us_initial_claims", "首次申领失业金人数(季调,周末为周六)", "人", "周"),
     "T10Y2Y": ("us_term_spread_10y2y", "10 年减 2 年美债利差", "百分点", "日"),
+    "VIXCLS": ("us_vix_close", "VIX 波动率指数(收盘,CBOE)", "指数点", "日"),
 }
 FRED_DEFAULT = "CPIAUCSL,CPILFESL,PCEPILFE,UNRATE,PAYEMS,FEDFUNDS,GDPC1"
 
 
-def fred_series(series: str = FRED_DEFAULT, start: Optional[str] = None) -> dict:
+def fred_series(series: str = FRED_DEFAULT, start: Optional[str] = None, detail: bool = False) -> dict:
     """FRED 宏观历史序列(fredgraph.csv,免 key):每个系列一次请求,单个失败记 errors 不拖垮其余。
-    返回 {start, series:{ID:{rows:[[date, value_str]], blank}}, errors:{ID: 原因}};值保持源字符串,空值 / "." 跳过并计数。"""
+    返回 {start, series:{ID:{rows:[[date, value_str]], blank}}, errors:{ID: 原因}};值保持源字符串,空值 / "." 跳过并计数。
+    detail 只给 mapper 用(逐观测点出证据),本函数忽略它。"""
     import re
     ids = [s.strip().upper() for s in str(series or "").split(",") if s.strip()]
     bad = [s for s in ids if s not in FRED_SERIES]

@@ -464,8 +464,10 @@ def _tencent_kline_call(path, param):
 
 
 @_v39_contract
-def tencent_kline(code, period="day", adjust=None, start=None, end=None, count=320):
+def tencent_kline(code, period="day", adjust=None, start=None, end=None, count=320, detail=False):
     """腾讯 K 线 — 日/周/月（默认前复权）与 1/5/15/30/60 分钟（不复权）。
+
+    detail 只给 mapper 用（逐根收盘出证据），本函数忽略它。
 
     period: day / week / month / m1 / m5 / m15 / m30 / m60
     adjust: None=日周月默认 qfq、分钟默认不复权；可显式传 'qfq' / 'hfq' / ''（不复权）

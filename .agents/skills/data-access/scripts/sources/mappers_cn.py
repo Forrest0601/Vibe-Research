@@ -212,6 +212,42 @@ def pboc_social_financing_map(result: list, ctx: dict) -> dict:
     return out(evs, extra={"months": [r["month"] for r in result]})  # 年内合计不在取数层计算
 
 
+def pboc_social_financing_stock_map(result: list, ctx: dict) -> dict:
+    if not result:
+        return empty("社融存量表为空")
+    evs = rows_fields(ctx, result, [("afre_stock", "social_financing_stock", "万亿元"), ("afre_stock_yoy", "social_financing_stock_yoy", "%")],
+                      period_of=lambda r: r["month"], key_of=lambda r: r["month"],
+                      note_of=lambda r: "人民银行社会融资规模存量统计表(月末存量与同比增速;增速为官方口径)")
+    return out(evs, extra={"months": [r["month"] for r in result]})
+
+
+def pboc_money_supply_map(result: list, ctx: dict) -> dict:
+    if not result:
+        return empty("货币供应量表为空")
+    evs = rows_fields(ctx, result, [("m2", "m2_balance", "亿元"), ("m1", "m1_balance", "亿元"), ("m0", "m0_balance", "亿元")],
+                      period_of=lambda r: r["month"], key_of=lambda r: r["month"],
+                      note_of=lambda r: "人民银行货币统计概览 · 货币供应量(月末余额;表内无同比列,同比由调用方自算)")
+    return out(evs, extra={"months": [r["month"] for r in result]})
+
+
+def em_macro_rrr_map(result: list, ctx: dict) -> dict:
+    if not result:
+        return empty("存款准备金率表为空")
+    evs = rows_fields(ctx, result, [("rate_big", "rrr_rate_big", "%"), ("rate_small", "rrr_rate_small", "%"), ("change_big", "rrr_change_big", "百分点"), ("change_small", "rrr_change_small", "百分点")],
+                      period_of=lambda r: r["trade_date"], key_of=lambda r: r["trade_date"], as_of_of=lambda r: r["trade_date"],
+                      note_of=lambda r: f"存款准备金率调整(大型={r.get('rate_big')}% 中小型={r.get('rate_small')}%);东财 datacenter")
+    return out(evs, extra={"count": len(result)})
+
+
+def em_macro_gdp_map(result: list, ctx: dict) -> dict:
+    if not result:
+        return empty("GDP 表为空")
+    evs = rows_fields(ctx, result, [("gdp_cum", "gdp_cum", "亿元"), ("gdp_cum_yoy", "gdp_cum_yoy", "%")],
+                      period_of=lambda r: r["period"], key_of=lambda r: r["period"],
+                      note_of=lambda r: f"GDP 现价季度累计(同比为累计同比);东财 datacenter,报告日 {r.get('report_date')}")
+    return out(evs, extra={"count": len(result)})
+
+
 def nbs_pmi_map(result: dict, ctx: dict) -> dict:
     period = (result or {}).get("period") or today_str()[:7]
     evs, missing = dict_fields(ctx, result, [("manufacturing_pmi", "pmi_manufacturing", "%"), ("non_manufacturing_pmi", "pmi_non_manufacturing", "%"), ("composite_pmi", "pmi_composite", "%"), ("pmi_large", "pmi_large_enterprise", "%"),
@@ -220,6 +256,30 @@ def nbs_pmi_map(result: dict, ctx: dict) -> dict:
 
 
 # ---------- 交易所备源 ----------
+def sse_market_overview_map(result: dict, ctx: dict) -> dict:
+    """上交所每日概况:每个产品行(主板 A 股 / B 股 / 科创板 / 沪市合计)的流通市值、市价总值、成交金额与两种口径换手率。
+    🔴 单位随源:金额亿元、换手率 %;换手率由交易所给出,不在这里重算 —— 复算口径写在 note 里。
+    """
+    prods = (result or {}).get("products") or []
+    if not prods:
+        return empty("上交所每日概况为空")
+    day = (result or {}).get("date") or today_str()
+    evs = []
+    fields = (("sse_float_market_value", "float_value", "亿元"), ("sse_market_value", "market_value", "亿元"),
+              ("sse_trade_amount", "amount", "亿元"), ("sse_turnover_pct", "turnover_pct", "%"),
+              ("sse_float_turnover_pct", "float_turnover_pct", "%"))
+    for p in prods:
+        rk = f"sse|{p.get('code')}"
+        note = (f"上交所每日概况·{p.get('name')}({p.get('code')});金额单位亿元、换手率单位 %(交易所原值);"
+                "换手率 = 成交金额 ÷ 市值(市价总值口径 / 流通市值口径两列都在源表里)")
+        for field, key, unit in fields:
+            v = p.get(key)
+            if isinstance(v, (int, float)):
+                evs.append(ev(ctx, field, v, unit, day, as_of=day, record_key=rk, note=note,
+                              raw_ref=p.get("_raw") or (result or {}).get("_raw")))
+    return out(evs, extra={"date": day, "products": [p.get("code") for p in prods]})
+
+
 def dragon_tiger_backup_map(result: dict, ctx: dict) -> dict:
     day = (result or {}).get("date") or today_str()
     sz = (result or {}).get("szse") or []

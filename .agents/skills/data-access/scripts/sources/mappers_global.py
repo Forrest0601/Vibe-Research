@@ -37,6 +37,12 @@ def kline_map(result: list, ctx: dict) -> dict:
     if not rows:
         return empty("K 线无有效收盘价")
     evs = series_summary(ctx, rows, field_prefix="kline_close", value_key="close", unit=mu, date_key="date")
+    # args.detail=true 时逐根出收盘证据(点多的请求请配合收窄 count;全序列仍以 raw_ref 为准)
+    if (ctx.get("args") or {}).get("detail"):
+        for r in rows:
+            c = _num(r.get("close"))
+            if c is not None:
+                evs.append(ev(ctx, "kline_close", c, mu, str(r["date"])[:10], as_of=str(r["date"])[:10], currency=None if mu == "元" else "n/a"))
     per = f"{str(rows[0]['date'])[:10]}..{str(rows[-1]['date'])[:10]}"
     gaps = []
     for key, fn in (("high", max), ("low", min)):
@@ -753,6 +759,13 @@ def fred_map(result: dict, ctx: dict) -> dict:
                       note=f"FRED {sid} {title};{freq}度,{when};序列在 raw_ref CSV 列 {field}"))
         evs.append(ev(mctx, f"{field}_points", len(rows), "条", f"{d0}..{d1}", currency="n/a", as_of=d1, raw_ref=ref, record_key=sid,
                       note=f"空值跳过 {(series[sid] or {}).get('blank', 0)} 个"))
+        # args.detail=true 时把每个观测点也出成一条证据(点多的系列请配合收窄 start,别把十年日线全倒进来)
+        if (ctx.get("args") or {}).get("detail"):
+            for d, v in (series[sid] or {}).get("rows") or []:
+                fv = to_float(v)
+                if fv is not None:
+                    evs.append(ev(mctx, field, fv, unit, str(d)[:10], currency=ccy, as_of=str(d)[:10], raw_ref=ref, record_key=sid,
+                                  note=f"FRED {sid} {title};{freq}度,{when}"))
     for sid, err in (r.get("errors") or {}).items():
         f = FRED_SERIES.get(sid, (sid,))[0]
         missing.append({"field": f"{f}_latest", "period": today_str(), "reason": f"FRED {sid} 取数失败:{str(err)[:120]}"})
