@@ -18,6 +18,7 @@ export const HOME_FEATURE_GROUPS = [
     { to: "/debate", title: "多空辩论", detail: "同一份数据正反立论，寻找盲点（A 股）" },
     { to: "/backtest", title: "回测", detail: "验证历史表现与策略假设" },
     { to: "/candidates", title: "候选池", detail: "按你设的条件逐只核对，不排名" },
+    { to: "/strategy-screen", title: "策略选股", detail: "按固定策略逐只核对，展示测算合理 PB" },
   ] },
   { title: "我的股票", detail: "自选、持仓和它们的事件", features: [
     { to: "/my-stocks", title: "自选与持仓", detail: "自选总览、持仓台账与收益" },
@@ -27,5 +28,6 @@ export const HOME_FEATURE_GROUPS = [
   { title: "资料库", detail: "把研究积累留在自己手里", features: [
     { to: "/my-reports", title: "我的研报", detail: "导入、查阅和分析研究资料" },
     { to: "/notes", title: "研究记录", detail: "沉淀观点、问题与研究笔记" },
+    { to: "/cycles-index", title: "周期指标", detail: "长周期极端值的复核" },
   ] },
 ] as const;

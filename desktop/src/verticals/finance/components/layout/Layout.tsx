@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation, useNavigation } from "react-router-dom";
 import {
-  Activity, Bell, CalendarDays, CandlestickChart, ChevronsLeft, ChevronsRight, Eye, EyeOff, FileText, FlaskConical, Github, Globe, Home, LayoutGrid, Library, ListFilter, Menu, X, Moon, NotebookPen, Radar, Settings, Star, Sun, Swords, Thermometer, UserRound, Wallet,
+  Activity, Bell, CalendarDays, CandlestickChart, ChevronsLeft, ChevronsRight, Eye, EyeOff, FileText, FlaskConical, Github, Globe, Home, LayoutGrid, Library, ListFilter, Menu, X, Moon, NotebookPen, Radar, Repeat, Settings, SlidersHorizontal, Star, Sun, Swords, Thermometer, UserRound, Wallet,
   Atom, BatteryCharging, BatteryFull, Bot, BrainCircuit, Cable, Car, CircuitBoard, Cpu, Database, Dna, Glasses, MemoryStick, Microchip, Pickaxe, Pill, Plane, Rocket, Shield, UtilityPole,
   type LucideIcon,
 } from "lucide-react";
@@ -24,7 +24,7 @@ const REPO_URL = "https://github.com/simonlin1212/Vibe-Research";
 const X_URL = "https://x.com/linsizhen";
 
 const ICONS: Record<NavIcon, LucideIcon> = {
-  Home, Swords, Activity, Radar, Thermometer, LayoutGrid, CandlestickChart, FlaskConical, ListFilter, Star, Wallet, CalendarDays, Bell, Library, FileText, NotebookPen, Settings,
+  Home, Swords, Activity, Radar, Thermometer, LayoutGrid, CandlestickChart, FlaskConical, ListFilter, SlidersHorizontal, Star, Wallet, CalendarDays, Bell, Library, FileText, NotebookPen, Settings,Repeat,
   Bot, Cpu, MemoryStick, Cable, CircuitBoard, Microchip, BatteryFull, Plane, Car, Pill,
   UtilityPole, Shield, Atom, Rocket, Dna, Pickaxe, BrainCircuit, Glasses, BatteryCharging, Database,
 };

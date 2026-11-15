@@ -16,7 +16,9 @@ import type { ImportResult } from "./importPositions.ts";
 import type { NotifyOverview } from "./notify.ts";
 import type { CalendarResult } from "./calendar.ts";
 import type { CandidateResult } from "./candidates.ts";
+import type { ScreenResult } from "./strategy.ts";
 import type { AbnormalResult } from "./abnormal.ts";
+import type { CyclesResult } from "./cycles.ts";
 import type { ReviewTiersResult } from "./reviewTiers.ts";
 import type { EarningsBriefResult } from "./earningsBrief.ts";
 import type { ShareCardResult } from "./shareCard.ts";
@@ -382,10 +384,14 @@ export const backend = {
   },
   /** 候选池:查询串由 candidateQuery 拼好(范围、各指标区间、排除项、是否重新取) */
   candidates: (query: string) => call<CandidateResult>(`/view/candidates?${query}`),
+  /** 策略选股:查询串由 strategyQuery 拼好(策略、范围、区间、模型参数、排除项、取数上限) */
+  strategyScreen: (query: string) => call<ScreenResult>(`/view/strategy_screen?${query}`),
   /** 判据回看:到期没判的(带写下以来的公告)、校准表、最近判过的 */
   verdicts: (opts: { refresh?: boolean } = {}) => call<VerdictResult>(`/view/verdicts${opts.refresh ? "?refresh=1" : ""}`),
   /** 异动接近度:后端读台账里的自选,按交易所规则推算;refresh=true 不用缓存 */
   abnormal: (opts: { refresh?: boolean } = {}) => call<AbnormalResult>(`/view/abnormal${opts.refresh ? "?refresh=1" : ""}`),
+  /** 周期指标:换手率 20 日均与恒指 250 日乖离率(后端按登记端点取数并算好);refresh=true 不用缓存 */
+  cycles: (opts: { refresh?: boolean } = {}) => call<CyclesResult>(`/view/cycles${opts.refresh ? "?refresh=1" : ""}`),
   /** 涨停分档:复盘那天(业务日)的涨停股按行业分档;refresh=true 当天的池不用缓存 */
   reviewTiers: (opts: { date: string; refresh?: boolean }) =>
     call<ReviewTiersResult>(`/view/review_tiers?date=${encodeURIComponent(opts.date)}${opts.refresh ? "&refresh=1" : ""}`),

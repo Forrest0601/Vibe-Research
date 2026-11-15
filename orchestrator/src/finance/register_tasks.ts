@@ -15,11 +15,13 @@ import { registerView } from "../views.ts";
 import { eventCalendar } from "./events.ts";
 import { verdictReview } from "./verdicts.ts";
 import { candidatePool } from "./candidates.ts";
+import { strategyScreen } from "./strategy_screen.ts";
 import { abnormalWatch } from "./abnormal.ts";
 import { reviewTiers } from "./review_tiers.ts";
 import { earningsBrief } from "./earnings_brief.ts";
 import { shareCard } from "./share_card.ts";
 import { holdingsAct, holdingsPerf, holdingsView } from "./holdings_view.ts";
+import { cyclesIndex } from "./cycles.ts";
 
 registerDeepTargetResolver((dataRoot) => new FinanceDeepTargetResolver(dataRoot));
 // 定时提醒同样只在提供 API 的入口注册;真正开始按点运行的是 api.ts 的 main()
@@ -27,9 +29,12 @@ registerSchedule(FINANCE_SCHEDULE);
 registerView({ id: "calendar", label: "事件日历", run: eventCalendar });
 registerView({ id: "verdicts", label: "判据回看", run: verdictReview });
 registerView({ id: "candidates", label: "候选池", run: candidatePool });
+registerView({ id: "strategy_screen", label: "策略选股", run: strategyScreen });
 registerView({ id: "abnormal", label: "异动接近度", run: abnormalWatch });
 registerView({ id: "review_tiers", label: "涨停分档", run: reviewTiers });
 registerView({ id: "earnings_brief", label: "财报前瞻与复盘", run: earningsBrief });
 registerView({ id: "share_card", label: "研究分享卡", run: shareCard });
 registerView({ id: "holdings", label: "持仓", run: holdingsView, act: holdingsAct });
 registerView({ id: "holdings_perf", label: "持仓收益率", run: holdingsPerf });
+// 周期指标:长周期极端值的复核(换手率 20 日均 / 恒指 250 日乖离率),不下底部结论
+registerView({ id: "cycles", label: "周期指标", run: cyclesIndex });

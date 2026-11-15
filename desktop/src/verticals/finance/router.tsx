@@ -26,6 +26,7 @@ export const router = createBrowserRouter([
       { path: "/sectors", lazy: async () => ({ Component: (await import("@/pages/Sectors")).Sectors }) },
       { path: "/sectors/:key", lazy: async () => ({ Component: (await import("@/pages/SectorDetail")).SectorDetail }) },
       { path: "/candidates", lazy: async () => ({ Component: (await import("@/pages/Candidates")).Candidates }) },
+      { path: "/strategy-screen", lazy: async () => ({ Component: (await import("@/pages/StrategyScreen")).StrategyScreen }) },
       { path: "/my-stocks", lazy: async () => ({ Component: (await import("@/pages/MyStocks")).MyStocks }) },
       { path: "/calendar", lazy: async () => ({ Component: (await import("@/pages/Calendar")).Calendar }) },
       { path: "/backtest", lazy: async () => ({ Component: (await import("@/pages/Backtest")).Backtest }) },
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
       { path: "/debate", lazy: async () => ({ Component: (await import("@/pages/Debate")).DebatePage }) },
       { path: "/my-reports", lazy: async () => ({ Component: (await import("@/pages/MyReports")).MyReports }) },
       { path: "/notes", lazy: async () => ({ Component: (await import("@/pages/Notes")).Notes }) },
+      { path: "/cycles-index", lazy: async () => ({ Component: (await import("@/pages/CyclesIndex")).CyclesIndex }) },
       { path: "/inbox", lazy: async () => ({ Component: (await import("@/pages/Inbox")).Inbox }) },
       { path: "/settings", element: <Settings /> },
       // 旧地址保留兼容（收藏的书签、旧提醒里的链接）：自选和持仓并成「自选与持仓」。

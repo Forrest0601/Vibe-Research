@@ -11,7 +11,8 @@
  */
 export const NAV_ICONS = [
   "Home", "Swords", "Activity", "Radar", "Thermometer", "LayoutGrid", "CandlestickChart",
-  "FlaskConical", "ListFilter", "Star", "Wallet", "CalendarDays", "Bell", "Library", "FileText", "NotebookPen", "Settings",
+  "FlaskConical", "ListFilter", "SlidersHorizontal", "Star", "Wallet", "CalendarDays", "Bell", "Library", "FileText", "NotebookPen", "Settings",
+  "Repeat",
   // 各板块（sectors.json 的 icon 字段）
   "Bot", "Cpu", "MemoryStick", "Cable", "CircuitBoard", "Microchip", "BatteryFull", "Plane", "Car", "Pill",
   "UtilityPole", "Shield", "Atom", "Rocket", "Dna", "Pickaxe", "BrainCircuit", "Glasses", "BatteryCharging", "Database",
@@ -46,6 +47,7 @@ export const NAV_SECTIONS: NavSection[] = [
     { to: "/debate", label: "多空辩论", icon: "Swords" },
     { to: "/backtest", label: "回测", icon: "FlaskConical" },
     { to: "/candidates", label: "候选池", icon: "ListFilter" },
+    { to: "/strategy-screen", label: "策略选股", icon: "SlidersHorizontal" },
   ] },
   { label: "我的股票", icon: "Star", pages: [
     { to: "/my-stocks", label: "自选与持仓", icon: "Wallet" },
@@ -55,6 +57,7 @@ export const NAV_SECTIONS: NavSection[] = [
   { label: "资料库", icon: "Library", pages: [
     { to: "/my-reports", label: "我的研报", icon: "FileText" },
     { to: "/notes", label: "研究记录", icon: "NotebookPen" },
+    { to: "/cycles-index", label: "周期指标", icon: "Repeat" },
   ] },
   { label: "接入 AI", icon: "Settings", pages: [{ to: "/settings", label: "接入 AI", icon: "Settings" }], pinned: true },
 ];
