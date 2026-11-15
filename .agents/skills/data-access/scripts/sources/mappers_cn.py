@@ -89,6 +89,7 @@ def sina_adjust_factor_map(result: list, ctx: dict) -> dict:
 _SINA_ITEMS = {"lrb": [("营业总收入", "revenue_total", "元"), ("营业收入", "revenue", "元"), ("营业利润", "operating_profit", "元"), ("利润总额", "total_profit", "元"), ("净利润", "net_profit", "元"),
                        ("归属于母公司所有者的净利润", "net_profit_parent", "元"), ("基本每股收益", "eps_basic", "元/股")],
                "fzb": [("资产总计", "total_assets", "元"), ("负债合计", "total_liabilities", "元"), ("所有者权益(或股东权益)合计", "total_equity", "元"), ("归属于母公司股东权益合计", "equity_parent", "元"),
+                       ("商誉", "goodwill", "元"),
                        ("货币资金", "cash", "元"), ("存货", "inventory", "元"), ("应收账款", "accounts_receivable", "元"), ("流动资产合计", "current_assets", "元"), ("流动负债合计", "current_liabilities", "元")],
                "llb": [("经营活动产生的现金流量净额", "cfo", "元"), ("投资活动产生的现金流量净额", "cfi", "元"), ("筹资活动产生的现金流量净额", "cff", "元"), ("现金及现金等价物净增加额", "net_cash_change", "元")]}
 
