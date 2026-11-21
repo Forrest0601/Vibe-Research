@@ -143,6 +143,12 @@ export function loadProductConfig(repoRoot: string, opts: {
   if (opts.providerOverride !== undefined) {
     cfg = mergeLayer(cfg, { provider: { profile: assertProfileId(opts.providerOverride, "--provider") } }); sources.push("cli");
   }
+  // python 支持相对路径:相对产品根(repoRoot)解析,比如 ".venv/bin/python"。
+  // 🔴 配置里写死绝对路径,仓库整个搬目录(或换台机器)就 spawn ENOENT —— 相对路径跟着仓库走,搬不坏。
+  //    裸命令(python3 / py)不是路径,原样保留交给 PATH;带盘符的 Windows 绝对路径也不当相对路径折叠。
+  if (cfg.python && !path.isAbsolute(cfg.python) && !/^[A-Za-z]:[\\/]/.test(cfg.python) && /[\\/]/.test(cfg.python)) {
+    cfg = { ...cfg, python: path.resolve(repoRoot, cfg.python) };
+  }
   const abs = (p: string) => path.resolve(repoRoot, p);
   return {
     ...cfg,

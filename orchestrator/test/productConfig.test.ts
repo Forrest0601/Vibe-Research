@@ -91,6 +91,24 @@ test("v1 旧配置照样能加载:旧引擎字段与旧环境变量只记进 ign
   assert.ok(!("reasoning" in pc.defaults) && !("constitution" in pc.paths), "旧字段不混进合并后的配置");
 });
 
+test("python 支持相对路径:相对产品根解析,仓库搬目录不失效;裸命令与 Windows 盘符路径不动", () => {
+  const repo = tmpRepo();
+  fs.writeFileSync(path.join(repo, PRODUCT_CONFIG_FILE), JSON.stringify({ python: ".venv/bin/python" }));
+  let pc = loadProductConfig(repo, { env: {} });
+  assert.equal(pc.python, path.join(repo, ".venv", "bin", "python"), "相对路径折叠成产品根下的绝对路径,spawn 不再 ENOENT");
+  // 配置搬到另一个目录的同名仓库,同一份相对配置照样指到自己仓库的 venv
+  const repo2 = tmpRepo();
+  fs.writeFileSync(path.join(repo2, PRODUCT_CONFIG_FILE), JSON.stringify({ python: ".venv/bin/python" }));
+  pc = loadProductConfig(repo2, { env: {} });
+  assert.equal(pc.python, path.join(repo2, ".venv", "bin", "python"), "绝对路径做不到这一点(这正是 ENOENT 的根因)");
+  fs.writeFileSync(path.join(repo, PRODUCT_CONFIG_FILE), JSON.stringify({ python: "python3" }));
+  assert.equal(loadProductConfig(repo, { env: {} }).python, "python3", "裸命令交给 PATH,不折叠");
+  fs.writeFileSync(path.join(repo, PRODUCT_CONFIG_FILE), JSON.stringify({ python: "C:\\venv\\python.exe" }));
+  assert.equal(loadProductConfig(repo, { env: {} }).python, "C:\\venv\\python.exe", "Windows 盘符路径不是相对路径");
+  pc = loadProductConfig(repo, { env: { VRA_PYTHON: "/abs/env-python" } });
+  assert.equal(pc.python, "/abs/env-python", "环境变量给的绝对路径原样保留");
+});
+
 test("configFromArgs:产品配置进入 RunConfig;CLI 覆盖配置文件;旧引擎字段不影响干跑", () => {
   const repo = tmpRepo();
   fs.writeFileSync(path.join(repo, PRODUCT_CONFIG_FILE), JSON.stringify({ engine: { codex_path: "engine/bin/codex" }, defaults: { turn_timeout_min: 7, gate_retries: 1 } }));
